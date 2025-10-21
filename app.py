@@ -1,5 +1,18 @@
 import streamlit as st
 from datetime import datetime
+import gspread
+from google.oauth2.service_account import Credentials
+
+# Define los alcances necesarios para interactuar con Sheets y Drive
+scopes = [
+    'https://www.googleapis.com/auth/spreadsheets',
+    'https://www.googleapis.com/auth/drive']
+
+# Carga las credenciales desde el archivo JSON
+credentials = Credentials.from_service_account_file('keys/keys.json', scopes=scopes)
+
+# Crea un cliente autorizado de gspread
+client = gspread.authorize(credentials)
 
 # --- CONFIGURACIÓN DE PÁGINA ---
 st.set_page_config(
@@ -71,7 +84,10 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- ENCABEZADO ---
-st.image('assets/Formimex.jpg', use_container_width=True)
+col1, col2, col3 = st.columns([1, 2, 1])
+with col2:
+    st.image('assets/Formimex.jpg', use_container_width=True)
+
 st.markdown("<h1 class='title'>Reporte de Inspección de Calidad</h1>", unsafe_allow_html=True)
 st.markdown("<p class='subtitle'>Sistema interno de control de calidad - Formimex</p>", unsafe_allow_html=True)
 st.write("---")
@@ -94,36 +110,37 @@ with st.form("formulario_inspeccion"):
 
     c1, c2 = st.columns(2)
     with c1:
-        cantidad_de_alambres_long = st.text_input("Cantidad de alambres (longitudinal)")
+        cantidad_de_alambres_long = st.number_input("Cantidad de alambres (longitudinal)", value=None, placeholder="Ingresa un numero")
 
     with c2:
-        cantidad_de_alambres_transv = st.text_input("Cantidad de alambres (transversal)")
+        cantidad_de_alambres_transv = st.number_input("Cantidad de alambres (transversal)", value=None, placeholder="Ingresa un numero")
         
 
     c1, c2 = st.columns(2)
     with c1:
-        dimension_de_malla_long = st.text_input("Dimension de la malla (longitudinal)")
+        dimension_de_malla_long = st.number_input("Dimension de la malla (longitudinal)", value=None, placeholder="Ingresa un numero")
 
     with c2:
-        dimension_de_malla_transv = st.text_input("Dimension de la malla (transversal)")
+        dimension_de_malla_transv = st.number_input("Dimension de la malla (transversal)", value=None, placeholder="Ingresa un numero")
 
     perimetro = st.selectbox("Perimetro",["Completo","Incompleto"])
 
     c1, c2 = st.columns(2)
     with c1:
-        puntas_long = st.text_input("Puntas (longitudinal)")
+        puntas_long = st.number_input("Puntas (longitudinal)", value=None, placeholder="Ingresa un numero")
 
     with c2:
-        puntas_transv = st.text_input("Puntas (transversal)")
+        puntas_transv = st.number_input("Puntas (transversal)", value=None, placeholder="Ingresa un numero")
 
     c1, c2 = st.columns(2)
     with c1:
-        despunte_long = st.text_input("Filos (longitudinal)")
+        despunte_long = st.number_input("Filos (longitudinal)", value=None, placeholder="Ingresa un numero")
 
     with c2:
-        despunte_transv = st.text_input("Filos (transversal)")
+        despunte_transv = st.number_input("Filos (transversal)", value=None, placeholder="Ingresa un numero")
     
-    puntos_despegados = st.text_input("Puntos despegados")
+    puntos_input = st.text_input("Puntos despegados")
+    puntos_despegados = int(puntos_input) if puntos_input else 0
 
     # --- Diámetro del alambre ---
     st.subheader("📏 Medición de diámetro del alambre")
@@ -199,6 +216,17 @@ with st.form("formulario_inspeccion"):
     enviado = st.form_submit_button("Guardar reporte")
 
     if enviado:
+        #Agregamos datos a tabla de Google Sheets
+        sheet = client.open('Inspección de calidad - Formimex').sheet1
+        sheet.append_row([str(fecha), proveedor, material, tipo, lote_de_produccion, inspector, 
+                        tipo_alambre, cantidad_de_alambres_long, cantidad_de_alambres_transv,
+                        perimetro, puntas_long, puntas_transv, despunte_long, despunte_transv, 
+                        puntos_despegados, dimension_de_malla_long,dimension_de_malla_transv, promedio_long,
+                        promedio_trans, promedio_espaciamiento_long, promedio_espaciamiento_trans, 
+                        cantidad_de_alambres_long*2, cantidad_de_alambres_transv*2,cantidad_de_alambres_transv*cantidad_de_alambres_long,
+                        puntos_de_soldadura, peso_malla, observaciones])
+
+        print("Fila añadida correctamente.")
         st.success("✅ El reporte ha sido registrado correctamente.")
         st.write("### Resumen del reporte")
         st.json({
