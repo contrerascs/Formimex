@@ -8,8 +8,11 @@ scopes = [
     'https://www.googleapis.com/auth/spreadsheets',
     'https://www.googleapis.com/auth/drive']
 
-# Carga las credenciales desde el archivo JSON
-credentials = Credentials.from_service_account_file('keys/keys.json', scopes=scopes)
+# Cargar las claves desde los secretos de Streamlit
+service_account_info = st.secrets["firebase"]
+
+# Crear las credenciales a partir del diccionario
+credentials = Credentials.from_service_account_info(service_account_info, scopes=scopes)
 
 # Crea un cliente autorizado de gspread
 client = gspread.authorize(credentials)
