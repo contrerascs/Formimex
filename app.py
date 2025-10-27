@@ -95,52 +95,54 @@ st.write("---")
 # --- FORMULARIO ---
 with st.form("formulario_inspeccion"):
     st.subheader("🧰 Datos generales")
+    reporte = []
     
-    fecha = st.date_input("Fecha de inspección", datetime.today())
-    proveedor = st.selectbox("Proveedor",["FORMIMEX"])
-    material = st.selectbox("Material a inspeccionar", ["MALLA 2X2 8/8", "MALLA 4X4 8/8"])
-    tipo = st.selectbox("Tipo",["MP","PT"])
-    proveedor_nuevo = st.selectbox("Proveedor nuevo",["SI","NO"])
-    inspector = st.selectbox("Nombre del inspector",["Samuel Contreras", "Mauricio Torres"])
-    lote_de_produccion = st.selectbox("Lote de produccion",["ROJO","NARANJA","MORADO","ROSA"])
+    fecha_inspeccion = st.date_input("Fecha de inspección", datetime.today())
+    reporte.append(fecha_inspeccion.strftime("%m-%y-%d"))    
+    reporte.append(st.selectbox("Proveedor",["FORMIMEX"]))
+    reporte.append(st.selectbox("Material a inspeccionar", ["MALLA 2X2 8/8", "MALLA 4X4 8/8"]))
+    reporte.append(st.selectbox("Tipo",["MP","PT"]))
+    reporte.append(st.selectbox("Proveedor nuevo",["NO","SI"]))
+    reporte.append(st.selectbox("Nombre del inspector",["Samuel Contreras", "Mauricio Torres"]))
+    reporte.append(st.selectbox("Lote de produccion",["ROJO","NARANJA","MORADO","VERDE","ROSA","AMARILLO","FORMIMEX"]))
 
     st.subheader("🏗️ Datos de la malla")
     
-    tipo_alambre = st.selectbox("Tipo de alambre",["LISO","CORRUGADO"])
+    reporte.append(st.selectbox("Tipo de alambre",["LISO","CORRUGADO"]))
 
     c1, c2 = st.columns(2)
     with c1:
-        cantidad_de_alambres_long = st.number_input("Cantidad de alambres (longitudinal)", value=None, placeholder="Ingresa un numero")
+        reporte.append(st.text_input("Cantidad de alambres (longitudinal)", value=None, placeholder="Ingresa un numero"))
 
     with c2:
-        cantidad_de_alambres_transv = st.number_input("Cantidad de alambres (transversal)", value=None, placeholder="Ingresa un numero")
+        reporte.append(st.text_input("Cantidad de alambres (transversal)", value=None, placeholder="Ingresa un numero"))
         
 
     c1, c2 = st.columns(2)
     with c1:
-        dimension_de_malla_long = st.number_input("Dimension de la malla (longitudinal)", value=None, placeholder="Ingresa un numero")
+        reporte.append(st.text_input("Dimension de la malla (longitudinal)", value=None, placeholder="Ingresa un numero"))
 
     with c2:
-        dimension_de_malla_transv = st.number_input("Dimension de la malla (transversal)", value=None, placeholder="Ingresa un numero")
+        reporte.append(st.text_input("Dimension de la malla (transversal)", value=None, placeholder="Ingresa un numero"))
 
-    perimetro = st.selectbox("Perimetro",["Completo","Incompleto"])
+    reporte.append(st.selectbox("Perimetro",["Completo","Incompleto"]))
 
     c1, c2 = st.columns(2)
     with c1:
-        puntas_long = st.number_input("Puntas (longitudinal)", value=None, placeholder="Ingresa un numero")
+        reporte.append(st.text_input("Puntas (longitudinal)", value=None, placeholder="Ingresa un numero"))
 
     with c2:
-        puntas_transv = st.number_input("Puntas (transversal)", value=None, placeholder="Ingresa un numero")
+        reporte.append(st.text_input("Puntas (transversal)", value=None, placeholder="Ingresa un numero"))
 
     c1, c2 = st.columns(2)
     with c1:
-        despunte_long = st.number_input("Filos (longitudinal)", value=None, placeholder="Ingresa un numero")
+        reporte.append(st.text_input("Filos (longitudinal)", value=None, placeholder="Ingresa un numero"))
 
     with c2:
-        despunte_transv = st.number_input("Filos (transversal)", value=None, placeholder="Ingresa un numero")
+        reporte.append(st.text_input("Filos (transversal)", value=None, placeholder="Ingresa un numero"))
     
     puntos_input = st.text_input("Puntos despegados")
-    puntos_despegados = int(puntos_input) if puntos_input else 0
+    reporte.append(int(puntos_input)) if puntos_input else 0
 
     # --- Diámetro del alambre ---
     st.subheader("📏 Medición de diámetro del alambre")
@@ -154,12 +156,14 @@ with st.form("formulario_inspeccion"):
             valor = st.text_input(f"Diámetro Longitudinal {i+1} (mm)", key=f"long_{i}")
             # Convertimos el valor solo si el campo no está vacío
             try:
+                reporte.append(float(valor))
                 muestras_long.append(float(valor))
             except ValueError:
                 pass  # si está vacío, no se agrega
 
         promedio_long = sum(muestras_long) / len(muestras_long) if muestras_long else 0
         st.info(f"**Promedio diámetro longitudinal:** {promedio_long:.2f} mm")
+        reporte.append(promedio_long)
 
     with col6:
         st.markdown("##### Transversal")
@@ -167,12 +171,14 @@ with st.form("formulario_inspeccion"):
         for i in range(8):
             valor = st.text_input(f"Diámetro Transversal {i+1} (mm)", key=f"trans_{i}")
             try:
+                reporte.append(float(valor))
                 muestras_trans.append(float(valor))
             except ValueError:
                 pass
 
         promedio_trans = sum(muestras_trans) / len(muestras_trans) if muestras_trans else 0
         st.info(f"**Promedio diámetro transversal:** {promedio_trans:.2f} mm")
+        reporte.append(promedio_trans)
 
     # --- Espaciamientos ---
     st.subheader("⚙️ Medición de espaciamientos")
@@ -186,12 +192,14 @@ with st.form("formulario_inspeccion"):
             valor = st.text_input(f"Espaciamiento Longitudinal {i+1} (mm)", key=f"esp_long_{i}")
             # Convertimos el valor solo si el campo no está vacío
             try:
+                reporte.append(float(valor))
                 muestras_long.append(float(valor))
             except ValueError:
                 pass  # si está vacío, no se agrega
 
         promedio_espaciamiento_long = sum(muestras_long) / len(muestras_long) if muestras_long else 0
         st.info(f"**Promedio espaciamiento longitudinal:** {promedio_espaciamiento_long:.2f} mm")
+        reporte.append(promedio_espaciamiento_long)
 
     with col6:
         st.markdown("##### Transversal")
@@ -199,16 +207,18 @@ with st.form("formulario_inspeccion"):
         for i in range(8):
             valor = st.text_input(f"Espaciamiento Transversal {i+1} (mm)", key=f"esp_trans_{i}")
             try:
+                reporte.append(float(valor))
                 muestras_trans.append(float(valor))
             except ValueError:
                 pass
 
         promedio_espaciamiento_trans = sum(muestras_trans) / len(muestras_trans) if muestras_trans else 0
         st.info(f"**Promedio espaciamiento transversal:** {promedio_espaciamiento_trans:.2f} mm")
+        reporte.append(promedio_espaciamiento_trans)
 
-    puntos_de_soldadura = st.selectbox("Resistencia de los puntos de soldadura",["10 A 25NM - 10 A 30NM"])
+    reporte.append(st.selectbox("Resistencia de los puntos de soldadura",["10 A 25NM - 10 A 30NM"]))
 
-    peso_malla = st.text_input("Peso de la malla (kg)")
+    reporte.append(st.text_input("Peso de la malla (kg)"))
 
     st.subheader("📸 Observaciones")
     observaciones = st.text_area("Observaciones del inspector")
@@ -217,24 +227,18 @@ with st.form("formulario_inspeccion"):
 
     if enviado:
         #Agregamos datos a tabla de Google Sheets
-        sheet = client.open('Inspección de calidad - Formimex').sheet1
-        sheet.append_row([str(fecha), proveedor, material, tipo, lote_de_produccion, inspector, 
-                        tipo_alambre, cantidad_de_alambres_long, cantidad_de_alambres_transv,
-                        perimetro, puntas_long, puntas_transv, despunte_long, despunte_transv, 
-                        puntos_despegados, dimension_de_malla_long,dimension_de_malla_transv, promedio_long,
-                        promedio_trans, promedio_espaciamiento_long, promedio_espaciamiento_trans, 
-                        cantidad_de_alambres_long*2, cantidad_de_alambres_transv*2,cantidad_de_alambres_transv*cantidad_de_alambres_long,
-                        puntos_de_soldadura, peso_malla, observaciones])
+        sheet = client.open('Inspeccion de calidad - Formimex - v2').sheet1
+        sheet.append_row(reporte)
+        print(reporte)
 
-        print("Fila añadida correctamente.")
         st.success("✅ El reporte ha sido registrado correctamente.")
         st.write("### Resumen del reporte")
         st.json({
-            "Inspector": inspector,
-            "Fecha": str(fecha),
-            "Proveedor": proveedor,
-            "Material": material,
-            "Lote de produccion": lote_de_produccion,
+            "Inspector": reporte[5],
+            "Fecha": str(reporte[0]),
+            "Proveedor": reporte[1],
+            "Material": reporte[2],
+            "Lote de produccion": reporte[6],
             "Promedio espaciamiento long(mm)": promedio_espaciamiento_long,
             "Promedio espaciamiento transv(mm)": promedio_espaciamiento_trans,
             "Promedio diámetro long(mm)": promedio_long,

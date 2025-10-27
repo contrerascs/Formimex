@@ -13,6 +13,6 @@ credentials = Credentials.from_service_account_file('keys/keys.json', scopes=sco
 client = gspread.authorize(credentials)
 
 #Agregamos datos a tabla de Google Sheets
-sheet = client.open('Inspección de calidad - Formimex').sheet1
+sheet = client.open('Inspeccion de calidad - Formimex - v2').sheet1
 #sheet.update('A1', [[1, 2, 3], [4, 5, 6]])
-sheet.append_row()
+sheet.append_row([1, 2, 3, 4, 5, 6])
