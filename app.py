@@ -144,9 +144,8 @@ with st.form("formulario_inspeccion"):
     with c2:
         reporte.append(st.text_input("Filos (transversal)", value=None, placeholder="Ingresa un numero"))
     
-    puntos_input = st.text_input("Puntos despegados")
-    reporte.append(int(puntos_input)) if puntos_input else 0
-
+    reporte.append(st.text_input("Puntos despegados"))
+    
     # --- Diámetro del alambre ---
     st.subheader("📏 Medición de diámetro del alambre")
 
@@ -229,6 +228,17 @@ with st.form("formulario_inspeccion"):
     enviado = st.form_submit_button("Guardar reporte")
 
     if enviado:
+        # Validar si hay campos vacíos o valores no numéricos donde se espera número
+        reporte = any(
+            valor in [None, "", []]  # lista vacía o texto vacío
+            for valor in reporte
+        )
+
+        if reporte or promedio_long == 0 or promedio_trans == 0 or promedio_espaciamiento_long == 0 or promedio_espaciamiento_trans == 0:
+            st.warning("⚠️ Por favor completa todos los campos antes de guardar el reporte.")
+    else:
+        # Aquí va tu código actual para guardar en Google Sheets
+        st.success("✅ Reporte guardado correctamente.")
         #Agregamos datos a tabla de Google Sheets
         sheet = client.open('Inspeccion de calidad - Formimex - v2').sheet1
         sheet.append_row(reporte)
