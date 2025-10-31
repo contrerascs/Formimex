@@ -91,7 +91,7 @@ col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
     st.image('assets/Formimex.jpg', width='stretch')
 
-st.markdown("<h1 class='title'>Reporte de Inspección de Calidad</h1>", unsafe_allow_html=True)
+#st.markdown("<h1 class='title'>Reporte de Inspección de Calidad</h1>", unsafe_allow_html=True)
 st.markdown("<p class='subtitle'>Sistema interno de control de calidad - Formimex</p>", unsafe_allow_html=True)
 st.write("---")
 
@@ -102,7 +102,7 @@ with st.form("formulario_inspeccion"):
 
     # * Campos no numéricos *
     fecha_inspeccion = st.date_input("Fecha de inspección", datetime.today())
-    reporte.append(fecha_inspeccion.strftime("%Y-%m-%d"))
+    reporte.append(fecha_inspeccion.strftime("%d-%m-%y"))
 
     proveedor = st.selectbox("Proveedor", ["FORMIMEX"])
     reporte.append(proveedor)
@@ -231,6 +231,8 @@ with st.form("formulario_inspeccion"):
     observaciones = st.text_area("Observaciones del inspector")
 
     enviado = st.form_submit_button("Guardar reporte")
+
+    reporte.append(str(fecha_inspeccion.strftime("%d-%m-%y")))
 
     # ✅ VALIDACIÓN FINAL
     if enviado:
