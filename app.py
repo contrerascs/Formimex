@@ -102,13 +102,17 @@ with st.form("formulario_inspeccion"):
 
     # * Campos no numéricos *
     fecha_inspeccion = st.date_input("Fecha de inspección", datetime.today())
-    reporte.append(fecha_inspeccion.strftime("%d-%m-%y"))
+    reporte.append(fecha_inspeccion.strftime("%m/%d/%y"))
 
     proveedor = st.selectbox("Proveedor", ["FORMIMEX"])
     reporte.append(proveedor)
 
     material = st.selectbox("Material a inspeccionar", ["MALLA 2X2 8/8", "MALLA 4X4 8/8"])
     reporte.append(material)
+    if material == 'MALLA 2X2 8/8':
+        materialh2 = '2X2 8/8'
+    else:
+        materialh2 = '4X4 8/8'
 
     tipo = st.selectbox("Tipo", ["MP", "PT"])
     reporte.append(tipo)
@@ -118,6 +122,10 @@ with st.form("formulario_inspeccion"):
 
     inspector = st.selectbox("Nombre del inspector", ["Samuel Contreras", "Mauricio Torres"])
     reporte.append(inspector)
+    if inspector == 'Samuel Contreras':
+        inspectorh2 = 'SAMUEL'
+    else:
+        inspectorh2 = 'MAURICIO'
 
     lote = st.selectbox("Lote de produccion", ["ROJO", "NARANJA", "MORADO", "VERDE", "ROSA", "AMARILLO", "FORMIMEX"])
     reporte.append(lote)
@@ -232,7 +240,11 @@ with st.form("formulario_inspeccion"):
 
     enviado = st.form_submit_button("Guardar reporte")
 
-    reporte.append(str(fecha_inspeccion.strftime("%d-%m-%y")))
+    reporte_h2 = [reporte[0],reporte[1],materialh2,reporte[3],reporte[4],'1/3 del ancho de la malla terminada y longitud debe incluir al menos 3 alambres transversales.',
+                  reporte[6],inspectorh2,reporte[7],reporte[7],reporte[8],reporte[9],reporte[10],reporte[11],reporte[12],reporte[12],reporte[13],
+                  reporte[14],reporte[15],reporte[16],reporte[17],reporte[17],reporte[26],reporte[35],(reporte[44]*0.1),(reporte[53]*0.1),reporte[54],
+                  reporte[54],reporte[55],reporte[55],observaciones]
+
 
     # ✅ VALIDACIÓN FINAL
     if enviado:
@@ -242,8 +254,16 @@ with st.form("formulario_inspeccion"):
             st.warning("⚠️ Todos los campos deben estar completos.")
         else:
             # ✅ Guardar en Google Sheets
-            sheet = client.open('Inspeccion de calidad - Formimex - v2').sheet1
-            sheet.append_row(reporte)
+            # Abrir el archivo de Google Sheets
+            spreadsheet = client.open('Registro de inspeccion de calidad - Formimex')
+
+            # Hoja 1: BASE DE DATOS
+            hoja1 = spreadsheet.worksheet('BASE DE DATOS')
+            hoja1.append_row(reporte, value_input_option='USER_ENTERED')
+
+            # Hoja 2: MALLA FO-CCA-04
+            hoja2 = spreadsheet.worksheet('MALLA FO-CCA-04')
+            hoja2.append_row(reporte_h2, value_input_option='USER_ENTERED')
 
             st.success("✅ Reporte guardado correctamente.")
             st.write("### Resumen del reporte")
