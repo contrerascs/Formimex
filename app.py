@@ -21,7 +21,7 @@ client = gspread.authorize(credentials)
 st.set_page_config(
     page_title="Formimex - Reporte de Inspección",
     page_icon="🧾",
-    layout="centered",
+    layout="centered"
 )
 
 # --- ESTILOS PERSONALIZADOS ---
@@ -104,35 +104,35 @@ with st.form("formulario_inspeccion"):
     fecha_inspeccion = st.date_input("Fecha de inspección", datetime.today())
     reporte.append(fecha_inspeccion.strftime("%m/%d/%y"))
 
-    proveedor = st.selectbox("Proveedor", ["FORMIMEX"])
+    proveedor = st.selectbox("Proveedor", ["FORMIMEX"],  index=None, placeholder="Selecciona el proveedor")
     reporte.append(proveedor)
 
-    material = st.selectbox("Material a inspeccionar", ["MALLA 2X2 8/8", "MALLA 4X4 8/8"])
+    material = st.selectbox("Material a inspeccionar", ["MALLA 2X2 8/8", "MALLA 4X4 8/8"], index=None, placeholder="Selecciona el material")
     reporte.append(material)
     if material == 'MALLA 2X2 8/8':
         materialh2 = '2X2 8/8'
     else:
         materialh2 = '4X4 8/8'
 
-    tipo = st.selectbox("Tipo", ["MP", "PT"])
+    tipo = st.selectbox("Tipo", ["MP", "PT"], index=None, placeholder="Selecciona el tipo")
     reporte.append(tipo)
 
-    proveedor_nuevo = st.selectbox("Proveedor nuevo", ["NO", "SI"])
+    proveedor_nuevo = st.selectbox("Proveedor nuevo", ["NO", "SI"], index=None, placeholder="Selecciona si es un nuevo proveedor")
     reporte.append(proveedor_nuevo)
 
-    inspector = st.selectbox("Nombre del inspector", ["Samuel Contreras", "Mauricio Torres"])
+    inspector = st.selectbox("Nombre del inspector", ["Samuel Contreras", "Mauricio Torres"], index=None, placeholder="Selecciona un inspector")
     reporte.append(inspector)
     if inspector == 'Samuel Contreras':
         inspectorh2 = 'SAMUEL'
     else:
         inspectorh2 = 'MAURICIO'
 
-    lote = st.selectbox("Lote de produccion", ["ROJO", "NARANJA", "MORADO", "VERDE", "ROSA", "AMARILLO", "FORMIMEX"])
+    lote = st.selectbox("Lote de produccion", ["ROJO", "NARANJA", "MORADO", "VERDE", "ROSA", "AMARILLO", "FORMIMEX"], index=None, placeholder="Selecciona un lote de produccion")
     reporte.append(lote)
 
     st.subheader("🏗️ Datos de la malla")
 
-    reporte.append(st.selectbox("Tipo de alambre", ["LISO", "CORRUGADO"]))
+    reporte.append(st.selectbox("Tipo de alambre", ["LISO", "CORRUGADO"], index=None, placeholder="Selecciona el tipo de alambre"))
 
     # * Campos numéricos con number_input *
     c1, c2 = st.columns(2)
