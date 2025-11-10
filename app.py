@@ -153,7 +153,7 @@ with st.form("formulario_inspeccion"):
         dim_trans = st.number_input("Dimension de la malla (transversal mm)", min_value=1.0, step=0.01)
         reporte.append(float(dim_trans))
 
-    reporte.append(st.selectbox("Perimetro", ["Completo", "Incompleto"]))
+    reporte.append(st.selectbox("Perimetro", ["Completo", "Incompleto"], index=None, placeholder='Selecciona una opción'))
 
     c1, c2 = st.columns(2)
     with c1:
@@ -230,7 +230,18 @@ with st.form("formulario_inspeccion"):
         st.info(f"**Promedio espaciamiento transversal:** {promedio_espaciamiento_trans:.2f} mm")
         reporte.append(round(promedio_espaciamiento_trans, 2))
 
-    reporte.append(st.selectbox("Resistencia de los puntos de soldadura", ["10 A 25NM - 10 A 30NM"]))
+    resistencia = st.selectbox("Resistencia de los puntos de soldadura", ["10 A 25NM - 10 A 30NM - SI CUMPLEN", "10 A 25NM - 10 A 30NM - NO CUMPLEN"],
+                                index=None, placeholder="Selecciona una opción")
+    
+    if resistencia == '10 A 25NM - 10 A 30NM - SI CUMPLEN':
+        reporte.append('10 A 25NM - 10 A 30NM')
+        reporte.append('LOS PUNTOS SI RESISTEN')
+    else:
+        reporte.append('10 A 25NM - 10 A 30NM')
+        reporte.append('LOS PUNTOS NO RESISTEN')
+
+    resistencia_no = st.number_input("Cantidad de puntos despegados", min_value=0, step=1)
+    reporte.append(int(resistencia_no))
 
     peso_malla = st.number_input("Peso de la malla (kg)", min_value=0.01, step=0.01)
     reporte.append(round(float(peso_malla), 2))
@@ -243,7 +254,7 @@ with st.form("formulario_inspeccion"):
     reporte_h2 = [reporte[0],reporte[1],materialh2,reporte[3],reporte[4],'1/3 del ancho de la malla terminada y longitud debe incluir al menos 3 alambres transversales.',
                   reporte[6],inspectorh2,reporte[7],reporte[7],reporte[8],reporte[9],reporte[10],reporte[11],reporte[12],reporte[12],reporte[13],
                   reporte[14],reporte[15],reporte[16],reporte[17],reporte[17],reporte[26],reporte[35],(reporte[44]*0.1),(reporte[53]*0.1),reporte[54],
-                  reporte[54],reporte[55],reporte[55],observaciones]
+                  reporte[54],reporte[57],reporte[57],observaciones]
 
 
     # ✅ VALIDACIÓN FINAL
@@ -264,6 +275,8 @@ with st.form("formulario_inspeccion"):
             # Hoja 2: MALLA FO-CCA-04
             hoja2 = spreadsheet.worksheet('MALLA FO-CCA-04')
             hoja2.append_row(reporte_h2, value_input_option='USER_ENTERED')
+
+            print(reporte_h2)
 
             st.success("✅ Reporte guardado correctamente.")
             st.write("### Resumen del reporte")
