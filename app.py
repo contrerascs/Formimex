@@ -233,12 +233,18 @@ with st.form("formulario_inspeccion"):
     resistencia = st.selectbox("Resistencia de los puntos de soldadura", ["10 A 25NM - 10 A 30NM - SI CUMPLEN", "10 A 25NM - 10 A 30NM - NO CUMPLEN"],
                                 index=None, placeholder="Selecciona una opción")
     
-    if resistencia == '10 A 25NM - 10 A 30NM - SI CUMPLEN':
-        reporte.append('10 A 25NM - 10 A 30NM')
-        reporte.append('LOS PUNTOS SI RESISTEN')
+    # Siempre agregar la etiqueta del campo
+    reporte.append('10 A 25NM - 10 A 30NM')
+
+    # Si no seleccionó nada → colocar None
+    if resistencia is None:
+        reporte.append(None)
     else:
-        reporte.append('10 A 25NM - 10 A 30NM')
-        reporte.append('LOS PUNTOS NO RESISTEN')
+        # Colocar el resultado según la opción seleccionada
+        if "SI CUMPLEN" in resistencia:
+            reporte.append('LOS PUNTOS SI RESISTEN')
+        else:
+            reporte.append('LOS PUNTOS NO RESISTEN')
 
     resistencia_no = st.number_input("Cantidad de puntos despegados", min_value=0, step=1)
     reporte.append(int(resistencia_no))
@@ -256,7 +262,6 @@ with st.form("formulario_inspeccion"):
                   reporte[14],reporte[15],reporte[16],reporte[17],reporte[17],reporte[26],reporte[35],(reporte[44]*0.1),(reporte[53]*0.1),reporte[54],
                   reporte[54],reporte[57],reporte[57],observaciones]
 
-
     # ✅ VALIDACIÓN FINAL
     if enviado:
         if observaciones.strip() == "":
@@ -265,7 +270,7 @@ with st.form("formulario_inspeccion"):
             st.warning("⚠️ Todos los campos deben estar completos.")
         else:
             # ✅ Guardar en Google Sheets
-            # Abrir el archivo de Google Sheets
+            #Abrir el archivo de Google Sheets
             spreadsheet = client.open('Registro de inspeccion de calidad - Formimex')
 
             # Hoja 1: BASE DE DATOS
