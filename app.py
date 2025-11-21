@@ -102,7 +102,7 @@ with st.form("formulario_inspeccion"):
 
     # * Campos no numéricos *
     fecha_inspeccion = st.date_input("Fecha de inspección", datetime.today())
-    reporte.append(fecha_inspeccion.strftime("%m/%d/%y"))
+    reporte.append(fecha_inspeccion.strftime("%d-%m-%y"))
 
     proveedor = st.selectbox("Proveedor", ["FORMIMEX"],  index=None, placeholder="Selecciona el proveedor")
     reporte.append(proveedor)
