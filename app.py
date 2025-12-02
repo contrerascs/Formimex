@@ -2,6 +2,7 @@ import streamlit as st
 from datetime import datetime
 import gspread
 from google.oauth2.service_account import Credentials
+from decimal import Decimal, ROUND_DOWN
 
 # Define los alcances necesarios para interactuar con Sheets y Drive
 scopes = [
