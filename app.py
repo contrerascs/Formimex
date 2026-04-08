@@ -147,11 +147,11 @@ with st.form("formulario_inspeccion"):
 
     c1, c2 = st.columns(2)
     with c1:
-        dim_long = st.number_input("Dimension de la malla (longitudinal mm)", min_value=1.0, step=0.01)
+        dim_long = st.number_input("Dimension de la malla (longitudinal cm)", min_value=1.0, step=0.01)
         reporte.append(float(dim_long))
 
     with c2:
-        dim_trans = st.number_input("Dimension de la malla (transversal mm)", min_value=1.0, step=0.01)
+        dim_trans = st.number_input("Dimension de la malla (transversal cm)", min_value=1.0, step=0.01)
         reporte.append(float(dim_trans))
 
     reporte.append(st.selectbox("Perimetro", ["Completo", "Incompleto"], index=None, placeholder='Selecciona una opción'))
