@@ -81,13 +81,13 @@ El sistema permite registrar:
 ## 📂 Estructura del Proyecto
 
 /src
-├─ app.py # Aplicación en Streamlit
-├─ utils/ # Funciones auxiliares
-├─ services/ # Conexiones con Google Sheets y Drive
-/template
-└─ FO-CCA-04.xlsx # Formato oficial de inspección
-/docs
-└─ Capturas/ # (Pendiente por agregar)
+- ├─ app.py # Aplicación en Streamlit
+- ├─ utils/ # Funciones auxiliares
+- ├─ services/ # Conexiones con Google Sheets y Drive
+- /template
+- └─ FO-CCA-04.xlsx # Formato oficial de inspección
+- /docs
+- └─ Capturas/ # (Pendiente por agregar)
 
 
 ## ✅ Funcionalidades
@@ -143,7 +143,6 @@ _(Pendiente por agregar)_
 
 **Samuel Contreras Cruz**  
 Supervisor de Calidad & Software Developer  
-📩 Email: _(Puedes agregarlo si deseas que esté público)_
 
 ---
 
