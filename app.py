@@ -121,7 +121,7 @@ with st.form("formulario_inspeccion"):
     proveedor_nuevo = st.selectbox("Proveedor nuevo", ["NO", "SI"], index=None, placeholder="Selecciona si es un nuevo proveedor")
     reporte.append(proveedor_nuevo)
 
-    inspector = st.selectbox("Nombre del inspector", ["Samuel Contreras", "Mauricio Torres"], index=None, placeholder="Selecciona un inspector")
+    inspector = st.selectbox("Nombre del inspector", ["Samuel Contreras"], index=None, placeholder="Selecciona un inspector")
     reporte.append(inspector)
     if inspector == 'Samuel Contreras':
         inspectorh2 = 'SAMUEL'
@@ -235,7 +235,7 @@ with st.form("formulario_inspeccion"):
                                 index=None, placeholder="Selecciona una opción")
     
     # Siempre agregar la etiqueta del campo
-    reporte.append('10 A 25NM - 10 A 30NM')
+    reporte.append('10 A 278.61KG')
 
     # Si no seleccionó nada → colocar None
     if resistencia is None:
