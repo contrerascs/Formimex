@@ -17,6 +17,7 @@ Previo al desarrollo, los reportes se llenaban manualmente en papel, provocando:
 - Dificultad para consulta histórica
 
 La aplicación:
+
 ✅ Genera reportes PDF automáticamente  
 ✅ Almacena los datos en una base de datos centralizada  
 ✅ Organiza documentos por fecha y por inspector  
