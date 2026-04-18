@@ -154,7 +154,7 @@ with st.form("formulario_inspeccion"):
         dim_trans = st.number_input("Dimension de la malla (transversal cm)", min_value=1.0, step=0.01)
         reporte.append(float(dim_trans))
 
-    reporte.append(st.selectbox("Perimetro", ["Completo", "Incompleto"], index=None, placeholder='Selecciona una opción'))
+    reporte.append(st.selectbox("Perimetro", ["COMPLETO", "INCOMPLETO"], index=None, placeholder='Selecciona una opción'))
 
     c1, c2 = st.columns(2)
     with c1:
@@ -231,7 +231,7 @@ with st.form("formulario_inspeccion"):
         st.info(f"**Promedio espaciamiento transversal:** {promedio_espaciamiento_trans:.2f} mm")
         reporte.append(round(promedio_espaciamiento_trans, 2))
 
-    resistencia = st.selectbox("Resistencia de los puntos de soldadura", ["10 A 25NM - 10 A 30NM - SI CUMPLEN", "10 A 25NM - 10 A 30NM - NO CUMPLEN"],
+    resistencia = st.selectbox("Resistencia de los puntos de soldadura", ["10 A 278.61KG - SI CUMPLEN", "10 A 278.61KG - NO CUMPLEN"],
                                 index=None, placeholder="Selecciona una opción")
     
     # Siempre agregar la etiqueta del campo
