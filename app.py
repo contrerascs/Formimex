@@ -121,12 +121,12 @@ with st.form("formulario_inspeccion"):
     proveedor_nuevo = st.selectbox("Proveedor nuevo", ["NO", "SI"], index=None, placeholder="Selecciona si es un nuevo proveedor")
     reporte.append(proveedor_nuevo)
 
-    inspector = st.selectbox("Nombre del inspector", ["Samuel Contreras"], index=None, placeholder="Selecciona un inspector")
+    inspector = st.selectbox("Nombre del inspector", ["Samuel Contreras"], ["Carlos Carrillo"], index=None, placeholder="Selecciona un inspector")
     reporte.append(inspector)
     if inspector == 'Samuel Contreras':
         inspectorh2 = 'SAMUEL'
     else:
-        inspectorh2 = 'MAURICIO'
+        inspectorh2 = 'CARLOS'
 
     lote = st.selectbox("Lote de produccion", ["ROJO", "NARANJA", "MORADO", "VERDE", "ROSA", "AMARILLO", "FORMIMEX"], index=None, placeholder="Selecciona un lote de produccion")
     reporte.append(lote)
