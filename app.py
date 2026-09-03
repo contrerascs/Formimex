@@ -3,7 +3,7 @@ from datetime import datetime
 import gspread
 from google.oauth2.service_account import Credentials
 from decimal import Decimal, ROUND_DOWN
-import zlib
+import random
 
 import historico as hist
 
@@ -375,20 +375,20 @@ with tab_rapido:
                          placeholder="Selecciona primero el tipo de malla")
 
         rr_variar = st.checkbox(
-            "Variar ligeramente las mediciones individuales",
+            "Variar las medidas en cada generación",
             value=True, key="rr_variar",
-            help="Aplica una dispersión pequeña y reproducible sobre la "
-                 "plantilla histórica, en lugar de repetir siempre las mismas "
-                 "lecturas para una misma combinación.")
+            help="Cada reporte cae en un punto distinto de la dispersión que "
+                 "ese proveedor ha mostrado históricamente (dimensiones, peso, "
+                 "diámetros y espaciamientos). Desactivado, entrega siempre el "
+                 "valor central de la tendencia.")
 
         completo = None not in (rr_proveedor, rr_malla, rr_dimension, rr_alambre)
         if st.button("⚡ Generar Reporte Rápido", key="rr_generar",
                      disabled=not completo):
-            # crc32 en lugar de hash(): hash() de cadenas cambia entre
-            # reinicios del proceso y haría irreproducible el reporte.
-            semilla = zlib.crc32("|".join([
-                str(rr_fecha.toordinal()), rr_proveedor, rr_malla,
-                rr_dimension, rr_alambre]).encode())
+            # Semilla nueva en cada generación: dos reportes de la misma
+            # combinación y el mismo día deben salir con medidas distintas.
+            # Se conserva como folio para poder reproducir el reporte luego.
+            semilla = random.randrange(1, 2**32)
             perfil = hist.predecir_perfil(indice, rr_proveedor, rr_malla,
                                           rr_dimension, rr_alambre,
                                           semilla=semilla, variar=rr_variar)
@@ -396,6 +396,7 @@ with tab_rapido:
                 st.error("No hay registros históricos suficientes para esa "
                          "combinación.")
             else:
+                perfil['_folio'] = semilla
                 st.session_state.rr_perfil = perfil
                 st.session_state.rr_contexto = (rr_fecha, rr_proveedor, rr_malla,
                                                 rr_dimension, rr_alambre)
@@ -420,7 +421,8 @@ with tab_rapido:
         st.caption(
             f"Tendencia calculada sobre: {perfil['_nivel']} · "
             f"{perfil['_n']} de {perfil['_n_nivel']} registros comparten el "
-            "armado dominante (mismo número de alambres)."
+            f"armado dominante (mismo número de alambres) · "
+            f"folio de generación {perfil.get('_folio', '—')}"
         )
 
         if perfil["_n"] < hist.MIN_REGISTROS:

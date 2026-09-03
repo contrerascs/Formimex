@@ -12,6 +12,7 @@ para no agregar dependencias nuevas al despliegue.
 
 import os
 import re
+import math
 import random
 import zipfile
 import statistics
@@ -85,6 +86,7 @@ RANGO_DIM_LARGO = (200.0, 330.0)
 RANGO_DIM_ANCHO = (100.0, 330.0)
 
 MIN_REGISTROS = 5  # minimo para confiar en un nivel de agrupacion
+MUESTRA_SUFICIENTE = 15  # a partir de aqui la dispersion del grupo es fiable
 
 # --------------------------------------------------------------------------
 # 3. LECTURA DE LA BASE
@@ -272,6 +274,97 @@ def _sin_outliers(valores):
 def _mediana(valores, decimales=2):
     v = _sin_outliers(valores)
     return round(statistics.median(v), decimales) if v else None
+
+
+def _dispersion_tipica(indice, material, dimension, campo, centro=None):
+    """Variacion interna habitual de un campo para ese material y medida.
+
+    Se toma la mediana de las desviaciones *dentro* de cada grupo con
+    muestra suficiente. No sirve la desviacion del conjunto entero: esa
+    mezcla productos distintos (300 cm contra 305 cm) y describiria la
+    diferencia entre proveedores, no cuanto varia la linea al producir.
+
+    Si ninguna medida igual tiene muestra bastante (el caso de 2.7 x 1.5,
+    de incorporacion reciente), se traslada la variacion *relativa* del
+    material: la tolerancia de corte y el calibre son los mismos aunque
+    cambie el tamano de la pieza.
+    """
+    def recolectar(mismo_tamano):
+        datos = []
+        for clave, filas in indice.items():
+            if clave[1] != material:
+                continue
+            if mismo_tamano and clave[2] != dimension:
+                continue
+            v = _sin_outliers([_numero(f, campo)
+                               for f in _configuracion_dominante(filas)])
+            if len(v) >= MUESTRA_SUFICIENTE:
+                datos.append((statistics.stdev(v), statistics.median(v)))
+        return datos
+
+    datos = recolectar(True)
+    if datos:
+        return statistics.median(d for d, _ in datos)
+    datos = recolectar(False)
+    if datos and centro:
+        relativa = statistics.median(d / m for d, m in datos if m)
+        return abs(centro) * relativa
+    return 0.0
+
+
+def _estadistica(valores, desv_referencia=None):
+    """Centro y dispersion reales de un campo dentro del grupo.
+
+    Devuelve (mediana, desviacion, minimo, maximo) sobre los valores ya
+    limpios de atipicos. El minimo y el maximo son medidas que realmente se
+    tomaron, y sirven de tope para que lo generado nunca salga del rango
+    que el proceso ha producido de verdad.
+
+    Con pocos registros la dispersion observada subestima la del proceso:
+    tres piezas casi identicas no prueban que la linea no varie, solo que
+    no hay muestra. En ese caso se conserva el centro del grupo y se adopta
+    la variacion interna habitual de ese material y medida.
+    """
+    v = _sin_outliers(valores)
+    if not v:
+        return None
+    centro = statistics.median(v)
+    desviacion = statistics.stdev(v) if len(v) >= 2 else 0.0
+    minimo, maximo = min(v), max(v)
+
+    if (desv_referencia and len(v) < MUESTRA_SUFICIENTE
+            and desv_referencia > desviacion):
+        desviacion = desv_referencia
+        minimo = min(minimo, centro - 2 * desv_referencia)
+        maximo = max(maximo, centro + 2 * desv_referencia)
+    return centro, desviacion, minimo, maximo
+
+
+def _muestrear(rng, est, decimales):
+    """Valor dentro de la dispersion historica del grupo.
+
+    Sin generador devuelve el centro (la tendencia pura). Con generador
+    toma una normal centrada en la mediana con la desviacion observada,
+    truncada al rango real: el reporte varia en cada emision pero nunca se
+    sale de lo que ese proveedor ha entregado historicamente.
+    """
+    if est is None:
+        return None
+    centro, desviacion, minimo, maximo = est
+    if rng is None or desviacion <= 0:
+        return round(centro, decimales)
+    # Los topes se cierran hacia adentro para que el redondeo final no
+    # empuje el valor fuera del rango realmente observado.
+    paso = 10.0 ** -decimales
+    piso = math.ceil(minimo / paso - 1e-9) * paso
+    techo = math.floor(maximo / paso + 1e-9) * paso
+    if piso > techo:
+        return round(centro, decimales)
+    for _ in range(12):
+        v = round(rng.gauss(centro, desviacion), decimales)
+        if piso <= v <= techo:
+            return v
+    return round(min(max(round(rng.gauss(centro, desviacion), decimales), piso), techo), decimales)
 
 
 def _moda(valores):
@@ -463,8 +556,20 @@ def predecir_perfil(indice, lote, tipo_malla, dimension, alambre,
     total_nivel = len(grupo)
     grupo = _configuracion_dominante(grupo)
 
+    # Un generador propio por reporte: con `variar` activo cada emision cae
+    # en un punto distinto de la dispersion historica del grupo.
+    rng = random.Random(semilla) if variar else None
+
     def med(nombre, dec=2):
-        return _mediana([_numero(f, nombre) for f in grupo], dec)
+        """Valor muestreado dentro de la tendencia de ese campo."""
+        valores = [_numero(f, nombre) for f in grupo]
+        referencia = None
+        if len(grupo) < MUESTRA_SUFICIENTE:
+            limpios = _sin_outliers(valores)
+            centro = statistics.median(limpios) if limpios else None
+            referencia = _dispersion_tipica(indice, material, dimension,
+                                            nombre, centro)
+        return _muestrear(rng, _estadistica(valores, referencia), dec)
 
     def mod(nombre):
         return _moda([_numero(f, nombre) for f in grupo])
@@ -514,8 +619,10 @@ def predecir_perfil(indice, lote, tipo_malla, dimension, alambre,
         if perfil.get(campo) is None:
             perfil[campo] = 1 if campo.startswith('cant_') else 0
 
-    rng = random.Random(semilla) if semilla is not None else None
-    plantilla = _medoide(grupo, perfil)
+    # La plantilla aporta la forma de las 8 lecturas (su dispersion interna).
+    # Sin variacion se usa el registro mas representativo; con variacion, una
+    # inspeccion real cualquiera del grupo, distinta en cada emision.
+    plantilla = rng.choice(grupo) if rng is not None else _medoide(grupo, perfil)
     perfil['diam_long'] = _serie(plantilla, IDX_DIAM_LONG,
                                  perfil['prom_diam_long'], 2, rng,
                                  0.02 if variar else 0)
