@@ -61,8 +61,8 @@ TIPOS_ALAMBRE = ['LISO', 'CORRUGADO']
 # (por ejemplo al terminar una practica) basta editar aqui.
 INSPECTORES = [
     'Samuel Contreras',
-    'Octavio Castro',
-    'Eiliano Arenas',
+    'Octavio Castruita',
+    'Emiliano Arenas',
 ]
 
 
