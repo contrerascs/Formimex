@@ -14,6 +14,7 @@ import os
 import re
 import math
 import random
+import unicodedata
 import zipfile
 import statistics
 import xml.etree.ElementTree as ET
@@ -54,6 +55,30 @@ IDX_ESP_TRANS = list(range(45, 53))   # ET1..ET8
 PROVEEDORES = ['NARANJA', 'VERDE', 'ROSA', 'FORMIMEX']
 TIPOS_MALLA = ['2x2', '4x4']
 TIPOS_ALAMBRE = ['LISO', 'CORRUGADO']
+
+# Inspectores habilitados. Unica lista: alimenta los dos formularios y la
+# abreviatura de la hoja FO-CCA-04. Para dar de alta o de baja a alguien
+# (por ejemplo al terminar una practica) basta editar aqui.
+INSPECTORES = [
+    'Samuel Contreras',
+    'Octavio Castro',
+    'Eiliano Arenas',
+]
+
+
+def abreviar_inspector(nombre):
+    """Primer nombre en mayusculas y sin acentos, como en FO-CCA-04.
+
+    La hoja siempre ha guardado la abreviatura asi (SAMUEL, MAURICIO,
+    FERNANDO, CARLOS, JOSUE...), de modo que se deriva del nombre en vez de
+    mantener una tabla aparte que haya que actualizar en cada alta.
+    """
+    if not nombre:
+        return ''
+    primero = str(nombre).strip().split()[0]
+    sin_acentos = unicodedata.normalize('NFKD', primero)
+    return ''.join(c for c in sin_acentos if not unicodedata.combining(c)).upper()
+
 
 MATERIAL_POR_MALLA = {'2x2': 'MALLA 2X2 8/8', '4x4': 'MALLA 4X4 8/8'}
 

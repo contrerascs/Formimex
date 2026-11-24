@@ -95,7 +95,7 @@ st.markdown("""
 def construir_reporte_h2(reporte, observaciones):
     """Traduce la fila de BASE DE DATOS al formato de la hoja MALLA FO-CCA-04."""
     materialh2 = '2X2 8/8' if reporte[2] == 'MALLA 2X2 8/8' else '4X4 8/8'
-    inspectorh2 = 'SAMUEL' if reporte[5] == 'Samuel Contreras' else 'FERNANDO'
+    inspectorh2 = hist.abreviar_inspector(reporte[5])
     return [reporte[0], reporte[1], materialh2, reporte[3], reporte[4],
             '1/3 del ancho de la malla terminada y longitud debe incluir al menos 3 alambres transversales.',
             reporte[6], inspectorh2, reporte[7], reporte[7], reporte[8], reporte[9],
@@ -154,7 +154,7 @@ with tab_completo, st.form("formulario_inspeccion"):
     proveedor_nuevo = st.selectbox("Proveedor nuevo", ["NO", "SI"], index=None, placeholder="Selecciona si es un nuevo proveedor")
     reporte.append(proveedor_nuevo)
 
-    inspector = st.selectbox("Nombre del inspector", ["Samuel Contreras"], index=None, placeholder="Selecciona un inspector")
+    inspector = st.selectbox("Nombre del inspector", hist.INSPECTORES, index=None, placeholder="Selecciona un inspector")
     reporte.append(inspector)
 
     lote = st.selectbox("Lote de produccion", ["ROJO", "NARANJA", "MORADO", "VERDE", "ROSA", "AMARILLO", "FORMIMEX"], index=None, placeholder="Selecciona un lote de produccion")
@@ -448,7 +448,7 @@ with tab_rapido:
             with g2:
                 rr_inspector = st.selectbox(
                     "Nombre del inspector",
-                    ["Samuel Contreras"], key=k("inspector"))
+                    hist.INSPECTORES, key=k("inspector"))
                 rr_perimetro = st.selectbox(
                     "Perímetro", ["COMPLETO", "INCOMPLETO"], key=k("perimetro"),
                     index=0 if perfil["perimetro"].upper() == "COMPLETO" else 1)
